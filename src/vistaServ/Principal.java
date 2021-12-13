@@ -4,7 +4,9 @@ package controladorServ;
 import ControladorServ.*;//llama todas las clases de la carpeta Clases
 import ControladorServ.ControladorServ;
 import ControladorServ.Celda;
-import ControladorServ.Palabra;
+
+//import ControladorServ.Palabra;
+
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -21,12 +23,17 @@ import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.YES_OPTION;
 //import javax.swing.Timer;
 
 
 
 public class Principal extends javax.swing.JFrame implements VistaS {
     ArrayList<String> PalabrasEnviarArrayList = new ArrayList<String>();
+    ArrayList<Integer> OX = new ArrayList<Integer>();
+    ArrayList<Integer> OY = new ArrayList<Integer>();
+    ArrayList<Integer> Direccion = new ArrayList<Integer>();
+    
     ControladorServ controlador;
     /** creado nuevo formulario Principal */
     public static int errores;//esta variable cuenta cuantas veces el usuario selecciono una casilla distinta a la de una letra de una palabra buscada
@@ -45,8 +52,11 @@ public class Principal extends javax.swing.JFrame implements VistaS {
     //Timer timer;//variable para el tiempo
     public static int hor, min, seg, cseg;//requerido para indicar la hora,minuto,segundo y sentesimas de segundo del cronometro
     //int color=0;//requerido para el timer
+    public double random;
+    
     
     public Principal() {
+        estaJugando = false;
         initComponents();
         this.setLocationRelativeTo(null);
         configuracionesvisible=false;  
@@ -63,7 +73,6 @@ public class Principal extends javax.swing.JFrame implements VistaS {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel2 = new javax.swing.JLabel();
         Escritorio = new javax.swing.JDesktopPane();
         PanelPalabras = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
@@ -81,10 +90,6 @@ public class Principal extends javax.swing.JFrame implements VistaS {
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-
-        jLabel2.setBackground(new java.awt.Color(240, 240, 0));
-        jLabel2.setText("jLabel1");
-        jLabel2.setOpaque(true);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Imagenes/logo.png")));
@@ -286,11 +291,15 @@ public class Principal extends javax.swing.JFrame implements VistaS {
         }
         for (int i = 0; i < 20; i++) {//recorre todas la 20 pabras y verifica cual esta llena y si esta llena es porque esta en el panel y la coloca en el sopa de letras
             if (!"".equals(palabra[i].getText())) {
+                PalabrasEnviarArrayList.add(palabras[i]);
                 if (palabra[i].isTachada()){
                     palabra[i].destachar();
                     Principal.palabra[i].setLongitudencontrada(0);
-                }               
+                }  
                 palabra[i].colocarpalabra();
+                OX.add(palabra[i].getX());
+                OY.add(palabra[i].getY());
+                Direccion.add(palabra[i].getDireccion());
             }
         }        
         palabrastachadas=0;
@@ -300,7 +309,7 @@ public class Principal extends javax.swing.JFrame implements VistaS {
         this.llenarEspaciosVacios();
         
         Enviar.setEnabled(true); 
-        PopUp();
+        //PopUp();
      }
     
     }//GEN-LAST:event_IniciarActionPerformed
@@ -351,7 +360,6 @@ public class Principal extends javax.swing.JFrame implements VistaS {
         for (int i = 0; i < 20; i++) {
             Principal.palabra[i]= new Palabra(i);
             Principal.palabra[i].cambiarTexto(palabras[i]);
-                PalabrasEnviarArrayList.add(palabras[i]);
             if (i<npalabras) {
                PanelPalabras.add(this.palabra[i]); 
             }
@@ -372,6 +380,7 @@ public class Principal extends javax.swing.JFrame implements VistaS {
     {
         //este arreglo ayuda a poner las letras del avecedario
         String abc[]={"A","B","C","D","E","F","G","H","I","J","K","L","M","N","Ñ","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+        
         Random random=new Random();
         for (int i = 0; i < nfilas; i++) {
             for (int j = 0; j < ncolumnas; j++) {
@@ -381,6 +390,7 @@ public class Principal extends javax.swing.JFrame implements VistaS {
             }
         }
     }
+    
     public void abrirPanelConfiguraciones(){
         if (!this.estaJugando&&!this.configuracionesvisible) {
             JInternalFrame panelConfiguraciones=new Configuracion(Escritorio);
@@ -395,44 +405,7 @@ public class Principal extends javax.swing.JFrame implements VistaS {
             } 
         }      
     }
-    /**
-     * @param args the command line arguments
-     */
-    //Metodo para poner a la escucha el cronometro
-     private ActionListener tiempo=new ActionListener() {
-        public void actionPerformed (ActionEvent ae ) {
-            //cronometro();
-        }
-    };
-    /* public void cronometro(){//este metodo se encarga de hace avanzar el cronometro
-         if (estaJugando) {
-            //timer.start();
-            cseg++;            
-            if (cseg == 60) {
-                cseg = 0;
-                seg++;
-            }
-            if (seg == 60) {
-                seg = 0;
-                min++;
-                color=min;
-            }
-            if (min == 60) {
-                min = 0;
-                hor++;                
-            }
-            //Aqui se asigna el tiempo al label jLtiempo
-            jLtiempo.setText((hor > 9 ? "" : "0") + hor + ":" + (min > 9 ? "" : "0") + min + ":" + (seg >9 ? "" : "0") + seg);
-         }
-     }*/
-     /*
-     public void reiniciarCronometro(){
-          Principal.estaJugando=false;//indica que ya finalizo el juego
-            hor=0;
-            min=0;
-            seg=0;
-            cseg=0;
-    }*/
+
     public void buscarPalabras(){
         try{
             // Abrimos el archivo
@@ -466,6 +439,7 @@ public class Principal extends javax.swing.JFrame implements VistaS {
             System.err.println("Ocurrio un error: " + e.getMessage());
         }
     }
+    
     public void guardarPalabras() {
         File ficheroAntiguo=new File("palabras.txt");
         /*Obtengo un numero aleatorio*/  
@@ -497,6 +471,7 @@ public class Principal extends javax.swing.JFrame implements VistaS {
              System.out.println(ex.getMessage());  
         }  
     }
+    
     public void EcribirFichero(File Ffichero,String SCadena){  
         try {  
                 //Si no Existe el fichero lo crea  
@@ -517,17 +492,7 @@ public class Principal extends javax.swing.JFrame implements VistaS {
                 System.out.println(ex.getMessage());  
              }   
       }
-/*    
-    public static void main(String args[]) {
 
-        /* Create and display the form 
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Principal().setVisible(true);
-            }
-        });
-    }
-*/
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Enviar;
@@ -537,7 +502,6 @@ public class Principal extends javax.swing.JFrame implements VistaS {
     private javax.swing.JTextArea Mensajes_Servidor;
     public static javax.swing.JPanel PanelPalabras;
     private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JMenu jMenu1;
@@ -577,16 +541,33 @@ public class Principal extends javax.swing.JFrame implements VistaS {
     
     @Override
     public void inicializar() {
-        Iniciar.setActionCommand(YES_OPTION);
-        Iniciar.addActionListener(controlador);
+        Enviar.setActionCommand(ENVIAR);
+        Enviar.addActionListener(controlador);
     }
  
     @Override
-    public ArrayList<String> EnviarPalabras(){  
+    public String EnviarPalabras(){  
        //Mensajes_Servidor.append("_______________________________________\n");
-       //Mensajes_Servidor.append("Enviando Palabras -> "+PalabrasEnviarArrayList+" <- al cliente...\n");
-        return PalabrasEnviarArrayList;
+       //Mensajes_Servidor.append("Enviando Palabras -> "+PalabrasEnviarArrayList+" <- al cliente...\n"); 
+        return PalabrasEnviarArrayList.toString();
     }
+    
+    @Override
+    public String EnviarX(){  
+        return OX.toString();
+    }
+    
+    @Override
+    public String EnviarY(){  
+        return OY.toString();
+    }    
+    
+@Override
+    public String EnviarDireccion(){  
+        return Direccion.toString();
+    }
+    
+    
     
     @Override
     public void PopUp(){
@@ -594,6 +575,13 @@ public class Principal extends javax.swing.JFrame implements VistaS {
         if (response == JOptionPane.YES_OPTION){
             Mensajes_Servidor.append("Enviando Palabras -> "+PalabrasEnviarArrayList+" <- al cliente...\n");
             EnviarPalabras();
+            Mensajes_Servidor.append("Enviando X -> "+OX+" <- al cliente...\n");
+            EnviarX();
+            Mensajes_Servidor.append("Enviando Y -> "+OY+" <- al cliente...\n");
+            EnviarY();
+            Mensajes_Servidor.append("Enviando Direccion -> "+Direccion+" <- al cliente...\n");
+            EnviarDireccion();
+            
         }else if (response == JOptionPane.NO_OPTION){
             if (estaJugando&&JOptionPane.showConfirmDialog(null, "Realmente dese finalir el juego","Finalizar juego",JOptionPane.YES_NO_OPTION)==0) {//verifica que el usuario si esta jugando y si esta jugando pregunta si realmente desea finalizar el juego
             Principal.estaJugando=false;
