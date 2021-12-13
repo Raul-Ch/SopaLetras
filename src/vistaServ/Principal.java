@@ -34,6 +34,8 @@ public class Principal extends javax.swing.JFrame implements VistaS {
     ArrayList<Integer> OY = new ArrayList<Integer>();
     ArrayList<Integer> Direccion = new ArrayList<Integer>();
     
+    //ArrayList<String> Paquetepalabras = new ArrayList<>();
+    
     ControladorServ controlador;
     /** creado nuevo formulario Principal */
     public static int errores;//esta variable cuenta cuantas veces el usuario selecciono una casilla distinta a la de una letra de una palabra buscada
